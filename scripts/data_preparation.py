@@ -1,4 +1,5 @@
 import os 
+import numpy as np
 import pandas as pd
 
 
@@ -14,37 +15,43 @@ def prepare_data():
 
     df = df.drop(["DOI (Reference)"], axis=1) # Drop reference column
 
-    # Rename columns to appropiate names
-    df.rename(columns={"Current_Density (A/g)": "Current_Density", 
-                       "Specific_Capacitance (Fg-1)": "Specific_Capacitance",
-                       "Material (M)": "Material",
-                       "E_Concentration (M)": "E_Concentration",
-                       "M_Density(g/cm3)": "M_Density",
-                       "Current_Collector (CC)": "Current_Collector",
-                       "Current_Collector (CC)": "Current_Collector",
-                       "E_H_Cation_Radius" : "E_Cation_Radius",
-                       "E_H_Anion_Radius" : "E_Anion_Radius",
+    # Rename columns to appropiate zbbrevations
+    df.rename(columns={"Current_Density (A/g)": "j", 
+                       "Specific_Capacitance (Fg-1)": "C_s",
+                       "Material (M)": "Mat",
+                       "M_Density(g/cm3)": "rho_m",
+                       "Current_Collector (CC)": "CC",
+                       "E_H_Cation_Radius" : "r_cat",
+                       "E_H_Anion_Radius" : "r_an",
+                       "E_pH": "pH",
+                       "E_Ionic_Conductivity": "sigma_ion",
+                       "E_Bare_Cation_Radius": "r⁰_cat",
+                       "Is_Binder": "B_flag",
+                       "Binder_Type": "B_type",
+                       "CC_Electrical_Conductivity": "sigma_cc",
+                       "CC_Thermal_Conductivity": "kappa_cc",
+                       "CC_Work_Function": "phi_cc",
+                       "Potential_Window": "Delta_V",
+                       "Morphology_Encoded": "Morph",
+                       "Synthesis_Method": "Synth",
+                       "Electrode_ID": "Group_ID",
                        }, inplace = True)
     
     # Remain only rows with writen input
-    df.drop(df.tail(len(df["Electrode_ID"]) - 185).index, inplace = True)
+    df.drop(df.tail(len(df["Group_ID"]) - 185).index, inplace = True)
 
     # Change to appropiate data type
-    df['Electrode_ID'] = df['Electrode_ID'].astype('int64')
-    df['Material'] = df['Material'].astype('int64')
-    df['Is_Binder'] = df['Is_Binder'].astype('int64')
-    df['Current_Collector'] = df['Current_Collector'].astype('int64')
-    df['Morphology_Encoded'] = df['Morphology_Encoded'].astype('int64')
-    df['Electrolyte_Type'] = df['Electrolyte_Type'].astype('int64')
-    df['Binder_Type'] = df['Binder_Type'].astype('int64')
-    df['Synthesis_Method'] = df['Synthesis_Method'].astype('int64')
-
-    ############### CHECK THIS IF REMAIN #######################3
-    df = df.drop(["Electrolyte_Type", "E_Anion_Conductivity", "E_Cation_Conductivity","E_Concentration"], axis = 1)
+    df['Group_ID'] = df['Group_ID'].astype('int64')
+    df['Mat'] = df['Mat'].astype('int64')
+    df['B_flag'] = df['B_flag'].astype('int64')
+    df['CC'] = df['CC'].astype('int64')
+    df['Morph'] = df['Morph'].astype('int64')
+    df['B_type'] = df['B_type'].astype('int64')
+    df['Synth'] = df['Synth'].astype('int64')
 
     # Save processed data
     os.makedirs(os.path.dirname(output_path), exist_ok = True)
-    df.to_csv(output_path)
+    df.to_csv(output_path, encoding="utf-8-sig")
     print(f"Processed data saved to {output_path}")
 
     return

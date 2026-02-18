@@ -8,19 +8,23 @@ from src.leakproof_ml.plots import plot_predictions, histogram_errors, plot_inte
 from src.leakproof_ml.plots import interpretability_comparison_plot
 
 # Models to obtain results for plotting
-models_name = ['XGBRegressor', 'Ridge', 'CatBoostRegressor', 'VotingRegressor_0']
+input_path = "raw_results"
+input_interpertability_path = "raw_interpretability_results"
+plot_path = "resulting_plots3"
+
+models_name = ['XGBRegressor', 'Ridge', 'CatboostRegressor']
 
 results ={}
 for model in models_name:
     # Create output directory   
-    output_path = f"resulting_plots/{model}/"
+    output_path = f"{plot_path}/{model}/"
     os.makedirs(os.path.dirname(output_path), exist_ok = True)
 
     # Metric plots
     for method in ["trainTest","trainTest_removed","randomCV","randomCV_removed","groupedCV", 
            "groupedCV_removed"]: 
         # Load results per methdology
-        results = load_results_from_json(f"raw_results/{model}/tuned/{method}.json")
+        results = load_results_from_json(f"{input_path}/{model}/tuned/{method}.json")
 
         # Create metric directory
         metric_path = os.path.join(output_path, "metrics")
@@ -35,7 +39,7 @@ for model in models_name:
     # Interpretability plots
     for method in ["pi", "shap"]:
         for key in ['trainTest', 'trainTest_removed', 'randomCV', 'randomCV_removed', 'groupedCV', 'groupedCV_removed']:
-            res = load_results_from_json(f"raw_interpretability_results/{model}/{method}/{method}_{key}.json")
+            res = load_results_from_json(f"{input_interpertability_path}/{model}/{method}/{method}_{key}.json")
             results[f"{method}_{key}"] = res
 
             # Create method directory
@@ -63,18 +67,19 @@ for model in models_name:
     
     # Plot comprehensive comparison plots shap
     interpretability_comparison_plot(
-        results['shap_groupedCV_removed'], results['shap_groupedCV'],
-        results['shap_randomCV_removed'], results['shap_randomCV'],
-        results['shap_trainTest_removed'], results['shap_trainTest'], 
-        method='shap', title=f'Comprehensive SHAP Importance Comparison for {model}', 
+        results['shap_groupedCV'],
+        results['shap_randomCV'],
+        method='shap', labels = ['Grouped CV', 'Random CV'],
+        title=f'Comprehensive SHAP Importance Comparison for {model}', 
         filename=f"{output_path}/final_shap_comparison_6bar.png"
         )
 
     # Plot comprehensive comparison plots permutation
     interpretability_comparison_plot(
-        results['pi_groupedCV_removed'], results['pi_groupedCV'],
-        results['pi_randomCV_removed'], results['pi_randomCV'],
-        results['pi_trainTest_removed'], results['pi_trainTest'], 
+        results['pi_groupedCV'],
+        results['pi_randomCV'],
         filename=f"{output_path}/final_pi_comparison_6bar.png",
-        method='perm', title=f'Comprehensive Permutation Importance Comparison for {model}'
+        method='perm', labels = ['Grouped CV', 'Random CV'],
+        title=f'Comprehensive Permutation Importance Comparison for {model}'
         )
+    

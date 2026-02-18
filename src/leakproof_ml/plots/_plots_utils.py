@@ -38,8 +38,11 @@ def _shap_barPlot_dictionary(shap_dict):
 
 
 
-def _align_interpretability_dicts(*dicts, key_features="features", 
-                                  key_means="importance_mean", key_stds="importance_std"):
+def _align_interpretability_dicts(
+        *dicts, 
+        key_features="features", 
+        key_means="importance_mean", 
+        key_stds="importance_std"):
     """
     Synchronize multiple interpretability dictionaries to a common feature set.
 

@@ -52,7 +52,7 @@ def plot_interpretability_bar(data, title, method = "perm", filename = None):
 
     # Add plot details
     ax.set_title(title, fontsize=16, fontweight='bold', pad=20)
-    ax.set_xlabel("Mean Permutation Importance (Decrease in Score)", fontsize=12)
+    ax.set_xlabel("Mean Importance", fontsize=12)
     ax.set_yticks(y)
     ax.set_yticklabels(feature_names, fontsize=12)
     ax.set_xlim(left=0) # Importance should start at zero
@@ -79,36 +79,44 @@ def plot_interpretability_bar(data, title, method = "perm", filename = None):
 
 
 
-
-def _plot_three_bars(data, title, filename = None):
+def _plot_n_bars(*dicts, feature_names, labels, title, filename = None):
     """
-    Generate a high-density vertical grouped bar plot for feature importance.
+    Generate a grouped vertical bar plot comparing feature importance 
+    across an arbitrary number of interpretability result sets, for every
+    feature. 
 
-    Designed for scientific papers, this function compares three methodologies 
-    simultaneously across all features. It uses dynamic scaling, 90-degree 
-    text rotations, and precise offsets to maintain clarity even when 
-    visualizing dozens of features.
+    Each dictionary represents one protocol, methodology, or experimental condition. 
+    Bars are grouped by feature, and each group contains one bar per dictionary. 
+    Error bars represent the standard deviation of the importance scores.
 
     Parameters
     ----------
-    data : dict
-        Dictionary containing the aligned importance data. Expected keys:
-        - 'feature_names': list of str.
-        - 'm1_with_means', 'm1_with_stds', 'm1_without_means', etc.: 
-          Lists of importance scores for each methodology/outlier state.
-        - 'm1_with_label', etc.: Strings for the legend entries.
-    title : str
-        The main title of the plot.
-    filename : str, optional
-        Path to save the plot. If None, the plot is displayed interactively.
+    *dicts : dict
+        Variable number of aligned interpretability dictionaries.
+        Each dictionary must contain:
+            - 'importance_mean' : list or array of mean importance values
+            - 'importance_std'  : list or array of standard deviations
+        All dictionaries must be aligned to the same feature order.
+    
+    feature_names : list of str
+        Ordered list of feature names corresponding to the aligned
+        importance values.
 
-    Returns
-    -------
-    None
+    labels : list of str
+        Labels for each dictionary (used in the legend). Must match
+        the number of provided dictionaries.
+
+    title : str
+        Title of the figure.
+
+    filename : str, optional
+        If provided, the figure is saved at this path (300 dpi).
+        If None, the figure is displayed interactively.
+
     """
-  
-    feature_names = data['feature_names']
+    
     num_features = len(feature_names)
+    num_protocols = len(dicts)
     
     # Style settings
     plt.style.use('seaborn-v0_8-whitegrid')
@@ -118,51 +126,30 @@ def _plot_three_bars(data, title, filename = None):
     # Bar Width and Separation
     bar_width = 0.3 
     separation_factor = 0.08
+    effective_width = bar_width + separation_factor
     
     # Horizontal Spacing
     gap_factor = 0.8 
-    group_span = 6 * bar_width 
+    group_span = num_protocols * bar_width 
     x_step = group_span + gap_factor 
     x = np.arange(num_features) * x_step
 
     # Dynamic Figure Size
-    fig_width_factor = 0.75 # Adjust based on feature count
-    fig, ax = plt.subplots(figsize=(max(10, num_features * fig_width_factor), 7)) 
+    fig_width = max(10, num_features * 0.75)
+    fig, ax = plt.subplots(figsize=(fig_width, 7))
 
-    # Offset Calculation: Positions 6 bars symmetrically around each feature center
-    effective_bar_width = bar_width + separation_factor 
-    offsets = np.array([-2.5, -1.5, -0.5, 0.5, 1.5, 2.5]) * effective_bar_width
+    # Offsets centered around feature positions for n bars
+    offsets = np.linspace(- (num_protocols - 1) / 2, (num_protocols - 1) / 2, num_protocols) * effective_width
 
     # Color Palette
-    color1_dark, color1_light = '#1f77b4', '#aec7e8'  # Azul
-    color2_dark, color2_light = '#ff7f0e', '#ffbb78'  # Naranja
-    color3_dark, color3_light = '#2ca02c', '#98df8a'  # Verde
-
-   # Plots 6 bars per feature, including error caps for standard deviation
-
-    # M1 - With Outliers (Dark Blue/Grey)
-    ax.bar(x + offsets[0], data['m1_with_means'], bar_width, yerr=data['m1_with_stds'], capsize=3, linewidth=0.4, 
-            label=data['m1_with_label'], color=color1_dark, edgecolor='black', error_kw=dict(lw=0.7, capsize=2, capthick=0.7))
-            
-    # M1 - Without Outliers (Light Blue/Grey)
-    ax.bar(x + offsets[1], data['m1_without_means'], bar_width, yerr=data['m1_without_stds'], capsize=3,linewidth=0.4, 
-            label=data['m1_without_label'], color=color1_light, edgecolor='black', error_kw=dict(lw=0.7, capsize=2, capthick=0.7))
-            
-    # M2 - With Outliers (Dark Red/Brown)
-    ax.bar(x + offsets[2], data['m2_with_means'], bar_width, yerr=data['m2_with_stds'], capsize=3,linewidth=0.4, 
-            label=data['m2_with_label'], color=color2_dark, edgecolor='black', error_kw=dict(lw=0.7, capsize=2, capthick=0.7))
-
-    # M2 - Without Outliers (Light Red/Brown)
-    ax.bar(x + offsets[3], data['m2_without_means'], bar_width, yerr=data['m2_without_stds'], capsize=3,linewidth=0.4, 
-            label=data['m2_without_label'], color=color2_light, edgecolor='black', error_kw=dict(lw=0.7, capsize=2, capthick=0.7))
-            
-    # M3 - With Outliers (Dark Green/Olive)
-    ax.bar(x + offsets[4], data['m3_with_means'], bar_width, yerr=data['m3_with_stds'], capsize=3,linewidth=0.4, 
-            label=data['m3_with_label'], color=color3_dark, edgecolor='black', error_kw=dict(lw=0.7, capsize=2, capthick=0.7))
-            
-    # M3 - Without Outliers (Light Green/Olive)
-    ax.bar(x + offsets[5], data['m3_without_means'], bar_width, yerr=data['m3_without_stds'], capsize=3,linewidth=0.4, 
-            label=data['m3_without_label'], color=color3_light, edgecolor='black',error_kw=dict(lw=0.7, capsize=2, capthick=0.7))
+    base_colors = plt.cm.tab10.colors  # Use a built-in color palette for up to 10 distinct colors
+    
+    # Plots n bars per feature, including error caps for standard deviation
+    for i in range(len(dicts)):
+        base_color = base_colors[i % len(base_colors)]
+        
+        ax.bar(x + offsets[i], dicts[i]['importance_mean'], bar_width, yerr=dicts[i]['importance_std'], capsize=3, linewidth=0.4, 
+               label=labels[i], color=base_color, edgecolor='black', error_kw=dict(lw=0.7, capsize=2, capthick=0.7))
 
     # Add plot details 
     ax.set_title(title, fontsize=16, fontweight='bold', pad=20)
@@ -177,15 +164,13 @@ def _plot_three_bars(data, title, filename = None):
     ax.grid(axis='x', visible=False) 
     
     # Add text labels above each bar for mean importance values
-    all_means = [data['m1_with_means'], data['m1_without_means'], data['m2_with_means'], 
-                 data['m2_without_means'], data['m3_with_means'], data['m3_without_means']]
-    all_stds = [data['m1_with_stds'], data['m1_without_stds'], data['m2_with_stds'], 
-                data['m2_without_stds'], data['m3_with_stds'], data['m3_without_stds']]
+    all_means = [d["importance_mean"] for d in dicts]
+    all_stds = [d["importance_std"] for d in dicts]
     
     for i in range(num_features):
         # Vertical divider for feature groups
         ax.axvline(x[i] - x_step/2, color="gray", linewidth=0.5, alpha=0.6)
-        for j in range(6):
+        for j in range(len(dicts)):
             mean = all_means[j][i]
             std = all_stds[j][i]
             x_pos = x[i] + offsets[j] # Central position of the bar
@@ -207,73 +192,68 @@ def _plot_three_bars(data, title, filename = None):
 
 
 
-def interpretability_comparison_plot(m1_removed, m1, m2_removed, m2, m3_removed, m3, method = 'perm',
-    title = None, filename = None):
+def interpretability_comparison_plot(*dicts, labels, method = 'perm', title = None, filename = None):
     """
-    Coordinate the alignment and plotting of six distinct interpretability result sets.
+    Align and compare multiple interpretability result sets in a single
+    grouped bar plot.
 
-    This function aligns feature sets across six dictionaries (representing 
-    three methodologies with/without outliers) and generates a grouped vertical 
-    bar plot for comparative analysis.
+    This function accepts an arbitrary number of interpretability result
+    dictionaries (e.g., different validation protocols, models, or 
+    outlier configurations), aligns their feature order (based on the first dictionary 
+    provided), and generates a comparative grouped bar visualization with each 
+    feature with n vertical bars depending on the number of dictionaries provided. 
+    Designed to be compatible with the provided intepretability functions on this package. 
 
     Parameters
     ----------
-    m1_removed, m1 : dict
-        Results for Methodology 1 (e.g., Simple Split) without and with outliers.
-    m2_removed, m2 : dict
-        Results for Methodology 2 (e.g., Random CV) without and with outliers.
-    m3_removed, m3 : dict
-        Results for Methodology 3 (e.g., Grouped CV) without and with outliers.
+    *dicts : dict
+        Variable number of interpretability result dictionaries.
+        Each dictionary must correspond to a single experimental condition
+
+    labels : list of str
+        Legend labels corresponding to each dictionary. The number of
+        labels must match the number of dictionaries.
+
     method : {'perm', 'shap'}, default='perm'
-        The interpretability method used.
+        Type of interpretability method used:
+            - 'perm' : permutation importance
+            - 'shap' : SHAP importance
+        If 'shap' is selected, dictionaries are internally converted
+        into global bar-plot format before alignment.
+
     title : str, optional
-        The main title for the comparison plot.
+        Title of the resulting plot.
+
     filename : str, optional
-        Path to save the resulting high-resolution image.
+        If provided, saves the plot at this location.
+        If None, displays it interactively.
+
+    Returns
+    -------
+    None
+        Generates a grouped bar comparison plot.
+
+    Raises
+    ------
+    ValueError
+        If the number of labels does not match the number of dictionaries.
+
     """
+     
+    # Ensure labels and dictionaries provided are the same length
+    if len(dicts) != len(labels):
+        raise ValueError("Number of dictionaries and labels must be the same. For plotting purposes.")
+
     # Ensure all dictionaries are in global importance format
     if method == "shap":
-        m1_removed = _shap_barPlot_dictionary(m1_removed)
-        m1 = _shap_barPlot_dictionary(m1)
-        m2_removed = _shap_barPlot_dictionary(m2_removed)
-        m2 = _shap_barPlot_dictionary(m2)
-        m3_removed = _shap_barPlot_dictionary(m3_removed)
-        m3 = _shap_barPlot_dictionary(m3)
+        dicts = [_shap_barPlot_dictionary(d) for d in dicts]
 
     # Collect and align the six result dictionaries
-    aligned_dicts = _align_interpretability_dicts(m1_removed, m1, m2_removed,m2, m3_removed, m3)
+    aligned_dicts = _align_interpretability_dicts(*dicts)
     
-    # Define labels based on the user's execution structure
-    method_labels = ['Grouped CV', 'Random CV','Simple Split']
-    
-    # Structure the data for the plot_three_pi_comparison function
-    plot_data = {
-        'feature_names': aligned_dicts[0]['features'], # All dicts now share the same feature order
-        
-        # M1: Simple Split / Train-Test
-        'm1_with_label': f"{method_labels[0]} (Without Outliers)",
-        'm1_with_means': aligned_dicts[0]['importance_mean'],
-        'm1_with_stds': aligned_dicts[0]['importance_std'],
-        'm1_without_label': f"{method_labels[0]} (With Outliers)",
-        'm1_without_means': aligned_dicts[1]['importance_mean'],
-        'm1_without_stds': aligned_dicts[1]['importance_std'],
-        
-        # M2: Random CV
-        'm2_with_label': f"{method_labels[1]} (Without Outliers)",
-        'm2_with_means': aligned_dicts[2]['importance_mean'],
-        'm2_with_stds': aligned_dicts[2]['importance_std'],
-        'm2_without_label': f"{method_labels[1]} (With Outliers)",
-        'm2_without_means': aligned_dicts[3]['importance_mean'],
-        'm2_without_stds': aligned_dicts[3]['importance_std'],
-        
-        # M3: Grouped CV
-        'm3_with_label': f"{method_labels[2]} (Without Outliers)",
-        'm3_with_means': aligned_dicts[4]['importance_mean'],
-        'm3_with_stds': aligned_dicts[4]['importance_std'],
-        'm3_without_label': f"{method_labels[2]} (With Outliers)",
-        'm3_without_means': aligned_dicts[5]['importance_mean'],
-        'm3_without_stds': aligned_dicts[5]['importance_std'],
-    }
+    # Features ordered consistently across all dictionaries
+    features_ordered = aligned_dicts[0]['features']
     
     # Generate plot
-    _plot_three_bars(plot_data, title, filename)
+    _plot_n_bars(*aligned_dicts, feature_names=features_ordered, 
+                 labels=labels, title=title, filename=filename)

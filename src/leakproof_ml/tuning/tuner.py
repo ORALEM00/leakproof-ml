@@ -13,12 +13,11 @@ from ..preprocessing.pipeline import model_pipeline, feature_pipeline
 from ..preprocessing._pipeline_utils import  _validate_pipeline, _get_pre_model_pipe
 
 
+
 def train_test_tunning(
         X, y, model_class, 
+        outer_splitter, inner_splitter, 
         space_search, 
-        inner_splits = 10,
-        outer_splitter = None, 
-        inner_splitter = None, 
         groups = None,
         ensemble_params = None,
         metrics = _REGRESSION_METRICS, 
@@ -49,6 +48,12 @@ def train_test_tunning(
         The estimator class to instantiate (e.g., RandomForestRegressor). 
         If a list of classes is provided, the function instantiates a 
         ``VotingRegressor`` using these models as ensemble.
+    outer_splitter : scikit-learn splitter, optional
+        A cross-validation splitter instance (e.g., ``ShuffleSplit``). It 
+        takes first precedence for splitting the data. 
+    inner_splitter : scikit-learn splitter, optional
+        The cross-validation splitter instance used for the hyperparameter 
+        tuning in the training set.
     space_search : callable
         A function that defines the hyperparameter search space. It must 
         accept an ``optuna.trial.Trial`` object and return a dictionary 
@@ -56,13 +61,6 @@ def train_test_tunning(
     inner_splits : int, default=10
         The number of folds for the inner cross-validation if ``inner_splitter`` 
         is None.
-    outer_splitter : scikit-learn splitter, optional
-        A cross-validation splitter instance (e.g., ``ShuffleSplit``). It 
-        takes first precedence for splitting the data. If None, a standard 
-        ``train_test_split`` with a 20% test size is performed.
-    inner_splitter : scikit-learn splitter, optional
-        The strategy for cross-validation during tuning. If None, uses ``KFold`` 
-        with ``inner_splits``.
     groups : array-like, optional
         Group labels for the samples used for splitting if a group-based 
         ``splitter`` is provided (e.g. ShuffleGroupKFold). Must be same 
@@ -127,26 +125,16 @@ def train_test_tunning(
     # Validate correct input format
     _validate_tuning_inputs(model_class, ensemble_params, n_folds=None)
 
-    # Implement an 80/20 shuffle split by default or use a provided scikit-learn splitter
-    if outer_splitter is None:
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = random_state)
-    else:
-        # Extract indices from the first fold of the provided splitter
-        train_index, test_index = next(outer_splitter.split(X, y=None, groups=groups))
-        X_train, X_test = X.iloc[train_index], X.iloc[test_index]
-        y_train, y_test = y.iloc[train_index], y.iloc[test_index]
-
-    # Create Inner split: default to KFold or use provided inner splitter logic
-    if inner_splitter is  None:
-        inner_cv_splitter = KFold(n_splits = inner_splits, shuffle = False)
-    else:
-        inner_cv_splitter = inner_splitter
+    # Extract indices from the first fold of the provided splitter
+    train_index, test_index = next(outer_splitter.split(X, y=None, groups=groups))
+    X_train, X_test = X.iloc[train_index], X.iloc[test_index]
+    y_train, y_test = y.iloc[train_index], y.iloc[test_index]
 
     # Ensure group labels are correctly sliced for the inner training subset
     groups_train = groups.iloc[train_index] if groups is not None else None
 
     # Application of hyperparameter tuning: execute Optuna study on the training subset
-    study_model = run_study(X_train, y_train, model_class, inner_cv_splitter, space_search, metrics = metrics, 
+    study_model = run_study(X_train, y_train, model_class, inner_splitter, space_search, metrics = metrics, 
                             pipeline_factory=pipeline_factory, feature_selection=feature_selection, groups=groups_train, 
                             mu = mu, ensemble_params=ensemble_params, direction=direction, random_state=random_state, 
                             n_trials=n_trials, **kwargs)
@@ -190,8 +178,6 @@ def train_test_tunning(
     metrics = _calculate_metrics(y_test, y_predict, metrics)
 
     return _create_cv_results_dict(metrics, y_predict, y_test, features, best_params)
-
-
 
 
 

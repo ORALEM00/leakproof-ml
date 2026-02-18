@@ -14,14 +14,15 @@ from ..preprocessing._pipeline_utils import  _validate_pipeline, _get_pre_model_
 
 
 
+
 def train_test_interpretability(
         X, y, model_class, 
-        method = "permutation", 
+        splitter, 
+        method = "permutation", groups = None, 
         features_to_use = None, 
         pi_n_repeats=30, 
         shap_background_size=None, 
         params = None,  weights = None,
-        splitter = None, groups = None,
         metrics = _REGRESSION_METRICS,
         pipeline_factory = None,   
         random_state = 42, 
@@ -43,8 +44,15 @@ def train_test_interpretability(
     model_class : type or list of types
         The estimator class to instantiate. If a list, a ``VotingRegressor`` 
         is created.
+    splitter : scikit-learn splitter, optional
+        A cross-validation splitter instance (e.g., ``ShuffleSplit``). It 
+        takes first precedence for splitting the data. 
     method : {'permutation', 'shap'}, default='permutation'
         The interpretability method to use.
+    groups : array-like, optional
+        Group labels for the samples used for splitting if a group-based 
+        ``splitter`` is provided (e.g. ShuffleGroupKFold). Must be same 
+        length as ``X`` and ``y``.
     features_to_use : list of str, optional
         Subset of features to keep from the original dataframe before analysis.
     pi_n_repeats : int, default=30
@@ -59,14 +67,6 @@ def train_test_interpretability(
     weights : array-like, optional
         Weights for the ``VotingRegressor``. Only used if ``model_class`` is a list.
         List length must match number of models.
-    splitter : scikit-learn splitter, optional
-        A cross-validation splitter instance (e.g., ``ShuffleSplit``). It 
-        takes first precedence for splitting the data. If None, a standard 
-        ``train_test_split`` with a 20% test size is performed.
-    groups : array-like, optional
-        Group labels for the samples used for splitting if a group-based 
-        ``splitter`` is provided (e.g. ShuffleGroupKFold). Must be same 
-        length as ``X`` and ``y``.
     metrics : dict, optional
         A dictionary where keys are metric names and values are callable 
         scoring functions. Defaults to ``_REGRESSION_METRICS``.
@@ -107,14 +107,10 @@ def train_test_interpretability(
     # Create dictionary to return results
     results_dict = {'method': method}
         
-    # Implement an 80/20 shuffle split by default or use a provided scikit-learn splitter 
-    if splitter is None:
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = random_state)
-    else:
-        # Extract indices from the first fold of the provided splitter
-        train_index, test_index = next(splitter.split(X, y=None, groups=groups))
-        X_train, X_test = X.iloc[train_index], X.iloc[test_index]
-        y_train, y_test = y.iloc[train_index], y.iloc[test_index]
+    # Extract indices from the first fold of the provided splitter
+    train_index, test_index = next(splitter.split(X, y=None, groups=groups))
+    X_train, X_test = X.iloc[train_index], X.iloc[test_index]
+    y_train, y_test = y.iloc[train_index], y.iloc[test_index]
 
     # Model Initialization: supports single estimators or VotingRegressor ensembles
     if isinstance(model_class, list):

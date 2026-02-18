@@ -168,7 +168,7 @@ def run_study(X, y, model_class, cv_splitter,  space_search, metrics, pipeline_f
         'metrics': metrics, 'mu': mu, 'direction': direction, 
         'random_state': random_state
     }
-    # Inject additional keyword arguments for pipelines or selectors
+    # Additional keyword arguments for pipelines or selectors
     common_args.update(kwargs)
 
     # Configure objective function: wrap with partial to bind static arguments

@@ -13,8 +13,8 @@ from ..preprocessing._pipeline_utils import  _validate_pipeline, _get_pre_model_
 
 def train_test_analysis(
         X, y, model_class, 
+        splitter, groups = None,
         params = None, weights = None,
-        splitter = None, groups = None,
         metrics = _REGRESSION_METRICS,
         return_features = True,
         pipeline_factory = None,
@@ -39,6 +39,13 @@ def train_test_analysis(
         The estimator class to instantiate (e.g., RandomForestRegressor). 
         If a list of classes is provided, the function instantiates a 
         ``VotingRegressor`` using these models as ensemble.
+    splitter : scikit-learn splitter, optional
+        A cross-validation splitter instance (e.g., ``ShuffleSplit``). It 
+        takes first precedence for splitting the data.
+    groups : array-like of shape (n_samples,), optional
+        Group labels for the samples used for splitting if a group-based 
+        ``splitter`` is provided (e.g. ShuffleGroupKFold). Must be same 
+        length as ``X`` and ``y``.
     params : dict or list of dicts, optional
         Hyperparameters for the model. If ``model_class`` is a list, ``params`` 
         must be a list of dictionaries corresponding to each model in the 
@@ -46,14 +53,6 @@ def train_test_analysis(
     weights : array-like of shape (n_models,), optional
         Weights for the ``VotingRegressor``. Only used if ``model_class`` is a list.
         List length must match number of models.
-    splitter : scikit-learn splitter, optional
-        A cross-validation splitter instance (e.g., ``ShuffleSplit``). It 
-        takes first precedence for splitting the data. If None, a standard 
-        ``train_test_split`` with a 20% test size is performed.
-    groups : array-like of shape (n_samples,), optional
-        Group labels for the samples used for splitting if a group-based 
-        ``splitter`` is provided (e.g. ShuffleGroupKFold). Must be same 
-        length as ``X`` and ``y``.
     metrics : dict, optional
         A dictionary where keys are metric names and values are callable 
         scoring functions. Defaults to ``_REGRESSION_METRICS``.
@@ -96,14 +95,10 @@ def train_test_analysis(
     # Validate correct input format
     _validate_inputs(model_class, params, n_folds = None)
 
-    # Implement an 80/20 shuffle split by default or use a provided scikit-learn splitter
-    if splitter is None:
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = random_state)
-    else:
-        # Extract indices from the first fold of the provided splitter
-        train_index, test_index = next(splitter.split(X, y=None, groups=groups))
-        X_train, X_test = X.iloc[train_index], X.iloc[test_index]
-        y_train, y_test = y.iloc[train_index], y.iloc[test_index]
+    # Extract indices from the first fold of the provided splitter
+    train_index, test_index = next(splitter.split(X, y=None, groups=groups))
+    X_train, X_test = X.iloc[train_index], X.iloc[test_index]
+    y_train, y_test = y.iloc[train_index], y.iloc[test_index]
 
     # Model Initialization: supports single estimators or VotingRegressor ensembles
     if isinstance(model_class, list):

@@ -7,7 +7,7 @@ from src.leakproof_ml.plots import plot_metric_scores
 
 input_path = "results"
 
-models_name = ['Ridge', 'Lasso', 'ElasticNet', 'SVR', 
+models_name = ['DummyRegressor', 'LinearRegression', 'Ridge', 'Lasso', 'ElasticNet', 'SVR', 
                'RandomForestRegressor', 'XGBRegressor', 
                'CatBoostRegressor', 'LGBMRegressor', 'MLPRegressor']
 
@@ -34,7 +34,7 @@ for model in models_name:
     # Results per model
     for method in methods: 
         # Load results per methdology
-        results = load_results_from_json(f"raw_results/{model}/tuned/{method}.json")
+        results = load_results_from_json(f"raw_results2/{model}/baseline/{method}.json")
         # Store metrics in dataframe for summary
         for metric in metrics:
             mean_val = np.mean(results[metric])
@@ -98,9 +98,9 @@ r2_data = {
 }
 
 
-plot_metric_scores(r2_data, 'Comparison of MAE Scores of Grouped CV', 'mae_grouped_cv.png')
+# plot_metric_scores(r2_data, 'Comparison of MAE Scores of Grouped CV', 'mae_grouped_cv.png')
 
-summary_path = "raw_results/summary_tuned.csv"
+summary_path = "raw_results2/summary_baseline.csv"
 
 os.makedirs(os.path.dirname(summary_path), exist_ok = True)
 summary_df.to_csv(summary_path)
