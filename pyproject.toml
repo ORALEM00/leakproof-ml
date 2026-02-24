@@ -45,8 +45,7 @@ full = ["shap>=0.43", "matplotlib>=3.5", "seaborn>=0.12"]
 
 
 [project.urls]
-Homepage = "https://github.com/pypa/sampleproject"
-Issues = "https://github.com/pypa/sampleproject/issues"
+Homepage = "https://github.com/ORALEM00/leakproof-ml.git"
 
 
 [tool.hatch.build.targets.wheel]

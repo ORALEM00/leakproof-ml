@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt 
 import seaborn as sns
@@ -33,6 +34,7 @@ def residual_errors(y, y_predictions, filename = None):
     plt.ylabel("Residuals")
     plt.title("Residual Plot")
     if filename:
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
         plt.savefig(filename, dpi=300)
         plt.close()
     else:
@@ -67,6 +69,7 @@ def histogram_errors(y, y_predictions, filename = None):
     plt.ylabel("Frequency")
     plt.title("Histogram of Residual Errors")
     if filename:
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
         plt.savefig(filename, dpi=300)
         plt.close()
     else:
@@ -99,6 +102,7 @@ def plot_predictions(y, y_predictions, filename = None):
     plt.ylabel('Predicted Values')
     plt.title('Predicted vs Actual Values')
     if filename:
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
         plt.savefig(filename, dpi=300)
         plt.close()
     else:
@@ -265,6 +269,7 @@ def feature_frequency(
     plt.yticks(fontsize=12)
     plt.tight_layout()
     if filename:
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
         plt.savefig(filename, dpi=300)
         plt.close()
     else:

@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from sklearn.ensemble import VotingRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
@@ -277,7 +278,7 @@ def _validate_single_model_inputs(model_class, params, n_folds = None):
 
 
 
-def _validate_inputs(model_class, params, n_folds = None):
+def _validate_inputs(X, y, model_class, params, n_folds = None):
     """
     Validate the structural integrity of model parameters in the CV analysis.
 
@@ -287,6 +288,10 @@ def _validate_inputs(model_class, params, n_folds = None):
 
     Parameters
     ----------
+    X : array-like of shape (n_samples, n_features)
+        The input data.
+    y : array-like of shape (n_samples,)
+        The target values.
     model_class : type or list
         The estimator class or a list of classes for ensemble methods.
     params : dict, list, or list of lists, optional
@@ -302,6 +307,12 @@ def _validate_inputs(model_class, params, n_folds = None):
     TypeError
         If the nested elements are not dictionaries.
     """
+    if not isinstance(X, pd.DataFrame):
+        raise TypeError("X must be a pandas DataFrame")
+
+    if not isinstance(y, pd.Series):
+        raise TypeError("y must be a pandas Series")
+    
     # No params given
     if params is None:
         return

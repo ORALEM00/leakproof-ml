@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import optuna 
 from optuna.samplers import TPESampler
 from functools import partial
@@ -7,7 +8,7 @@ from ..modeling.training import cv_analysis
 from ..modeling._model_utils import _validate_ensemble_model_inputs
 
 
-def _validate_tuning_inputs(model_class, params, n_folds = None):
+def _validate_tuning_inputs(X, y, model_class, params, n_folds = None):
     """
     Specific validation for hyperparameter tuning structures. 
     Params can only be a list of dicts or list of lists of dicts 
@@ -15,6 +16,10 @@ def _validate_tuning_inputs(model_class, params, n_folds = None):
 
     Parameters
     ----------
+    X : array-like of shape (n_samples, n_features)
+        The input data.
+    y : array-like of shape (n_samples,)
+        The target values.
     model_class : list
         List of estimator classes/instances.
     params : list
@@ -22,6 +27,12 @@ def _validate_tuning_inputs(model_class, params, n_folds = None):
     n_folds : int, optional
         The number of CV folds, required if params is a 2D list.
     """
+    if not isinstance(X, pd.DataFrame):
+        raise TypeError("X must be a pandas DataFrame")
+
+    if not isinstance(y, pd.Series):
+        raise TypeError("y must be a pandas Series")
+    
     # No params given
     if params is None:
         return

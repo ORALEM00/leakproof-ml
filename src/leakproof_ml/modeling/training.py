@@ -93,7 +93,7 @@ def train_test_analysis(
         print(results['metrics']['r2'])
     """
     # Validate correct input format
-    _validate_inputs(model_class, params, n_folds = None)
+    _validate_inputs(X, y, model_class, params, n_folds = None)
 
     # Extract indices from the first fold of the provided splitter
     train_index, test_index = next(splitter.split(X, y=None, groups=groups))
@@ -231,8 +231,7 @@ def cv_analysis(
     """
 
     # Validate correct input format
-    # _validate_cv_inputs(model_class, splitter, params)
-    _validate_inputs(model_class, params, n_folds = getattr(splitter, "n_splits", None))
+    _validate_inputs(X, y, model_class, params, n_folds = getattr(splitter, "n_splits", None))
     
     # Store metric scores
     metric_results = {name: [] for name in metrics.keys()}

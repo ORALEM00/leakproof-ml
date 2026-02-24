@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -72,6 +73,7 @@ def plot_interpretability_bar(data, title, method = "perm", filename = None):
     
     plt.tight_layout()
     if filename:
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
         plt.savefig(filename, dpi=300)
         plt.close()
     else:
@@ -185,6 +187,7 @@ def _plot_n_bars(*dicts, feature_names, labels, title, filename = None):
     
     plt.tight_layout()
     if filename:
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
         plt.savefig(filename, dpi=300)
         plt.close()
     else:

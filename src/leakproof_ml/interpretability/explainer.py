@@ -97,7 +97,7 @@ def train_test_interpretability(
         results = train_test_interpretability(X, y, RandomForestRegressor, method="shap")
     """
     # Validate correct input format
-    _validate_inputs(model_class, params, n_folds = None)
+    _validate_inputs(X, y, model_class, params, n_folds = None)
     
     # Subset features if specified
     if features_to_use:
@@ -268,8 +268,7 @@ def cv_interpretability(
         results = cv_interpretability(X, y, XGBRegressor, cv, method="shap")
     """
     # Validate correct input format
-    # _validate_cv_inputs(model_class, splitter, params)
-    _validate_inputs(model_class, params, n_folds = getattr(splitter, "n_splits", None))
+    _validate_inputs(X, y, model_class, params, n_folds = getattr(splitter, "n_splits", None))
     
     # Subset features if specified
     if features_to_use:

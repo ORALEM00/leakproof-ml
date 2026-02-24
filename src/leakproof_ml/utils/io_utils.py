@@ -71,8 +71,11 @@ def save_results_as_json(results_dict, base_path, model_name, stage, filename):
     -------
     None
     """
-    # Directory Management: construct and create the destination path
-    model_dir = os.path.join(base_path, model_name, stage)
+    # Get absolute path for the base directory
+    absolute_path = os.path.abspath(base_path)
+
+    # Create the directory structure if it doesn't exist
+    model_dir = os.path.join(absolute_path, model_name, stage)
     os.makedirs(model_dir, exist_ok=True)
     file_path = os.path.join(model_dir, f"{filename}.json")
 

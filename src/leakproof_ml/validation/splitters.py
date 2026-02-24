@@ -65,7 +65,7 @@ class ShuffledGroupKFold(BaseCrossValidator):
 
         # Index Generation: Iterate through folds to create train/test masks
         for fold in folds:
-            test_mask = groups.isin(fold)
+            test_mask = np.isin(groups, fold)
             # Convert mask to integer indices for scikit-learn compatibility
             train_idx = np.where(~test_mask)[0]
             test_idx = np.where(test_mask)[0]

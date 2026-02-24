@@ -85,7 +85,11 @@ class CorrelationSelector(SelectorMixin, BaseEstimator, TransformerMixin):
             # Append the selected feature
             features_to_keep.add(best_feature)
 
-        self.to_keep_ = sorted(list(features_to_keep))
+        # self.to_keep_ = sorted(list(features_to_keep))
+        self.to_keep_ = [
+            col for col in self.feature_names_in_
+            if col in features_to_keep
+        ]
         return self
     
     def _get_support_mask(self):

@@ -123,7 +123,7 @@ def train_test_tunning(
         print(results['metrics']['r2'])
     """
     # Validate correct input format
-    _validate_tuning_inputs(model_class, ensemble_params, n_folds=None)
+    _validate_tuning_inputs(X, y, model_class, ensemble_params, n_folds=None)
 
     # Extract indices from the first fold of the provided splitter
     train_index, test_index = next(outer_splitter.split(X, y=None, groups=groups))
@@ -131,7 +131,11 @@ def train_test_tunning(
     y_train, y_test = y.iloc[train_index], y.iloc[test_index]
 
     # Ensure group labels are correctly sliced for the inner training subset
-    groups_train = groups.iloc[train_index] if groups is not None else None
+    # groups_train = groups.iloc[train_index] if groups is not None else None
+    if isinstance(groups, pd.Series):
+            groups_train = groups.iloc[train_index]
+    else:
+        groups_train = groups[train_index] if groups is not None else None
 
     # Application of hyperparameter tuning: execute Optuna study on the training subset
     study_model = run_study(X_train, y_train, model_class, inner_splitter, space_search, metrics = metrics, 
@@ -262,7 +266,7 @@ def nested_cv_tunning(
         predictions, tracked features, and the best params found per fold.
     """
     # Validate correct input format
-    _validate_tuning_inputs(model_class, ensemble_params, n_folds=outer_splitter.get_n_splits())
+    _validate_tuning_inputs(X, y, model_class, ensemble_params, n_folds=outer_splitter.get_n_splits())
 
     # Store metric scores
     metric_scores = {name: [] for name in metrics.keys()}
@@ -280,7 +284,11 @@ def nested_cv_tunning(
         y_train, y_test = y.iloc[train_index], y.iloc[test_index]
 
         # Slice groups to match the current outer training and testing sets
-        groups_train= groups.iloc[train_index] if groups is not None else None
+        # groups_train= groups.iloc[train_index] if groups is not None else None
+        if isinstance(groups, pd.Series):
+            groups_train = groups.iloc[train_index]
+        else:
+            groups_train = groups[train_index] if groups is not None else None
 
         # Parameter Handling: extract the ensemble models parameters for the current fold
         params_fold = []
