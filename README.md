@@ -5,7 +5,7 @@
 
 ## Install
 
-Leakproof ML can be installed from [PyPI](https://pypi.org/project/shap): 
+Leakproof ML can be installed from [PyPI](https://pypi.org/project/leakproof-ml/): 
 
 <pre>
 pip install leakproof_ml
@@ -48,7 +48,7 @@ results = cv_analysis(X, y, XGBRegressor, splitter, groups=groups, params = {"ma
 plot_predictions(results['y_true'], results['y_predict'])
 ```
 <p align="center">
-  <img width="616" src="./resulting_plots\XGBRegressor\metrics\groupedCV_predictions.png" />
+  <img width="616" src="./examples\vanadium_supercapacitor\resulting_plots\XGBRegressor\metrics\groupedCV_predictions.png" />
 </p>
 
 ### Tuning
@@ -84,7 +84,7 @@ results = cv_interpretability(X, y, model, splitter, groups=groups)
 plot_interpretability_bar(results)
 ```
 <p align="center">
-  <img width="616" src="./resulting_plots\XGBRegressor\pi\pi_groupedCV.png" />
+  <img width="616" src="./examples\vanadium_supercapacitor\resulting_plots\XGBRegressor\pi\pi_groupedCV.png" />
 </p>
 
 ## Custom Pipeline
