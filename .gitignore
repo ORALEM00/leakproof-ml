@@ -1,5 +1,7 @@
 # Virtual Enviroment
 venv/
+virtualMachine/
+test_venv/
 
 catboost_info/
 
