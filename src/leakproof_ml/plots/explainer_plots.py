@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from ._plots_utils import _shap_barPlot_dictionary, _align_interpretability_dicts
 
 
-def plot_interpretability_bar(data, title, method = "perm", filename = None):
+def plot_interpretability_bar(data, title, method = "perm", filename = None, fontsize=12):
     """
     Generate a horizontal bar plot for feature importance.
 
@@ -52,10 +52,10 @@ def plot_interpretability_bar(data, title, method = "perm", filename = None):
            color='#1f77b4', edgecolor='black')
 
     # Add plot details
-    ax.set_title(title, fontsize=16, fontweight='bold', pad=20)
-    ax.set_xlabel("Mean Importance", fontsize=12)
+    ax.set_title(title, fontsize=fontsize+4, fontweight='bold', pad=20)
+    ax.set_xlabel("Mean Importance", fontsize=fontsize, fontweight='bold')
     ax.set_yticks(y)
-    ax.set_yticklabels(feature_names, fontsize=12)
+    ax.set_yticklabels(feature_names, fontsize=fontsize)
     ax.set_xlim(left=0) # Importance should start at zero
     ax.invert_yaxis()
 
@@ -69,7 +69,7 @@ def plot_interpretability_bar(data, title, method = "perm", filename = None):
         x_pos = means[i] + stds[i] + offset
         ax.text(x_pos, y[i],
                 f"{means[i]:.3f}",
-                ha='left', va='center', fontsize=10, fontweight='bold')
+                ha='left', va='center', fontsize=fontsize-2, fontweight='bold')
     
     plt.tight_layout()
     if filename:
@@ -81,7 +81,7 @@ def plot_interpretability_bar(data, title, method = "perm", filename = None):
 
 
 
-def _plot_n_bars(*dicts, feature_names, labels, title, filename = None):
+def _plot_n_bars(*dicts, feature_names, labels, title, filename = None, fontsize=12):
     """
     Generate a grouped vertical bar plot comparing feature importance 
     across an arbitrary number of interpretability result sets, for every
@@ -154,13 +154,14 @@ def _plot_n_bars(*dicts, feature_names, labels, title, filename = None):
                label=labels[i], color=base_color, edgecolor='black', error_kw=dict(lw=0.7, capsize=2, capthick=0.7))
 
     # Add plot details 
-    ax.set_title(title, fontsize=16, fontweight='bold', pad=20)
-    ax.set_ylabel("Mean Permutation Importance (Decrease in $R^2$ Score)", fontsize=12) 
+    ax.set_title(title, fontsize=fontsize+4, fontweight='bold', pad=20)
+    ax.set_ylabel("Mean Feature Importance", fontsize=fontsize+3)
     ax.set_xticks(x)
+    plt.yticks(fontsize=fontsize)
     # Rotate x-axis labels for readability
-    ax.set_xticklabels(feature_names, rotation=45, ha='right')
+    ax.set_xticklabels(feature_names, rotation=45, ha='right', fontsize=fontsize+1)
 
-    ax.legend(fontsize=10, loc='upper right')
+    ax.legend(fontsize=fontsize+2, loc='upper right')
     ax.set_ylim(bottom=0)
     ax.grid(axis='y', visible = False) 
     ax.grid(axis='x', visible=False) 
@@ -180,10 +181,10 @@ def _plot_n_bars(*dicts, feature_names, labels, title, filename = None):
             y_pos = mean + std + offset # Y position above the error bar
             
             # Only add label if mean importance is greater than 0.00
-            if mean > 0.00:
-                ax.text(x_pos, y_pos,
-                        f"{mean:.3f}",
-                        ha='center', va='bottom', fontsize=8, rotation=90) 
+            #if mean > 0.00:
+            #    ax.text(x_pos, y_pos,
+            #            f"{mean:.3f}",
+            #            ha='center', va='bottom', fontsize=fontsize-2, rotation=90) 
     
     plt.tight_layout()
     if filename:
@@ -195,7 +196,7 @@ def _plot_n_bars(*dicts, feature_names, labels, title, filename = None):
 
 
 
-def interpretability_comparison_plot(*dicts, labels, method = 'perm', title = None, filename = None):
+def interpretability_comparison_plot(*dicts, labels, method = 'perm', title = None, filename = None, fontsize=12):
     """
     Align and compare multiple interpretability result sets in a single
     grouped bar plot.
@@ -259,4 +260,4 @@ def interpretability_comparison_plot(*dicts, labels, method = 'perm', title = No
     
     # Generate plot
     _plot_n_bars(*aligned_dicts, feature_names=features_ordered, 
-                 labels=labels, title=title, filename=filename)
+                 labels=labels, title=title, filename=filename, fontsize=fontsize)

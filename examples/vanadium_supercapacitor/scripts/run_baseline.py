@@ -37,7 +37,7 @@ os.chdir(base_dir)
 input_path = "data/processed.csv"
 index_cols = "Num_Data" 
 # Output path
-output_path = "raw_results2"
+output_path = "raw_results"
 summary_filename = "summary_baseline.csv"
 
 # Load dataset
@@ -55,11 +55,9 @@ y_removed = df_removed['C_s']
 groups_removed = df_removed['Group_ID']
 
 # Model's classes to be implemented (not the model itself)
-""" model_class = [DummyRegressor, LinearRegression, Ridge, 
+model_class = [DummyRegressor, LinearRegression, Ridge, 
                RandomForestRegressor, XGBRegressor, CatBoostRegressor, 
-               MLPRegressor, [XGBRegressor, Ridge, CatBoostRegressor]] """
-model_class = [XGBRegressor]
-
+               MLPRegressor, [XGBRegressor, Ridge, CatBoostRegressor]]
 
 # Create CV splitters
 random_cv_splitter = KFold(n_splits = n_splits, random_state = RANDOM_SEED, shuffle = True)
@@ -87,7 +85,6 @@ for model in model_class:
     randomCV = cv_analysis(X, y, model, random_cv_splitter, feature_selection = True)
     randomCV_removed = cv_analysis(X_removed, y_removed, model, random_cv_splitter, feature_selection = True) # With Outliers
     # Grouped CV
-    #groupedCV = cv_analysis(df, model, grouped_cv_splitter, feature_selection = True)
     groupedCV = cv_analysis(X, y, model, grouped_cv_splitter, groups=groups, feature_selection = True)
     groupedCV_removed = cv_analysis(X_removed, y_removed, model, grouped_cv_splitter, groups=groups_removed, feature_selection = True)
 

@@ -7,6 +7,10 @@ from leakproof_ml.utils import  load_results_from_json
 from leakproof_ml.plots import plot_predictions, histogram_errors, plot_interpretability_bar 
 from leakproof_ml.plots import interpretability_comparison_plot
 
+"""
+Plotting of the results from the tuning and interpretability processes
+"""
+
 # Script absolute path
 script_dir = os.path.dirname(os.path.abspath(__file__))
 base_dir = os.path.dirname(script_dir)
@@ -14,13 +18,36 @@ base_dir = os.path.dirname(script_dir)
 os.chdir(base_dir) 
 
 # Input path
-input_path = "raw_results2"
-input_interpertability_path = "raw_interpretability_results2"
+input_path = "raw_results"
+input_interpertability_path = "raw_interpretability_results"
 # Output path
-plot_path = "resulting_plots2"
+plot_path = "resulting_plots"
+
+# Mapping of feature names to more descriptive labels for plotting
+FEATURE_MAP = {
+    "Mat":       "Material",
+    "sigma_ion": "Ionic Conductivity",
+    "r0_cat":    "Bare Cation Radius",
+    "r0_an":     "Bare Anion Radius",
+    "r_cat":     "Hydrated Cation Radius",
+    "r_an":      "Hydrated Anion Radius",
+    "B_flag":    "Binder Presence",
+    "B_type":    "Binder Type",
+    "Morph":     "Morphology",
+    "rho_m":     "Material Density",
+    "pH":        "pH",
+    "CC":        "Current Collector (CC)",
+    "sigma_cc":  "CC Electrical Conductivity",
+    "kappa_cc":  "CC Thermal Conductivity",
+    "phi_cc":    "CC Work Function",
+    "Delta_V":   "Potential Window",
+    "Synth":     "Synthesis Method",
+    "j":         "Current Density",
+}
+
 
 # Models to be plotted
-models_name = ['XGBRegressor', 'Ridge', 'CatboostRegressor', 'VotingRegressor_0', 'VotingRegressor_1']
+models_name = ['XGBRegressor', 'Ridge', 'CatboostRegressor']
 
 results ={}
 for model in models_name:
@@ -49,6 +76,9 @@ for model in models_name:
         for key in ['trainTest', 'trainTest_removed', 'randomCV', 'randomCV_removed', 'groupedCV', 'groupedCV_removed']:
             res = load_results_from_json(f"{input_interpertability_path}/{model}/{method}/{method}_{key}.json")
             results[f"{method}_{key}"] = res
+            
+            # Map feature names to descriptive labels
+            results[f"{method}_{key}"]["features"] = [FEATURE_MAP.get(feature, feature) for feature in results[f"{method}_{key}"]["features"]]
 
             # Create method directory
             method_path = os.path.join(output_path, method)
@@ -70,7 +100,18 @@ for model in models_name:
                     show=False
                 )
                 plt.tight_layout()
-                plt.savefig(f"{method_path}/shap_summary_{key}.png", dpi=300)
+                # Plot details  
+                ax = plt.gca()
+                ax.tick_params(axis='y', labelsize=16) 
+                ax.tick_params(axis='x', labelsize=15) 
+                plt.xlabel('SHAP Value (Impact on Model Output)', fontsize=16, fontweight='bold')
+                plt.subplots_adjust(left=0.4)
+                # Legend details
+                cbar_ax = plt.gcf().axes[1]
+                cbar_ax.tick_params(labelsize=15)   
+                cbar_ax.set_ylabel("Feature value", fontsize=17, fontweight='bold')
+                # Save figure    
+                plt.savefig(f"{method_path}/shap_summary_{key}.png", dpi=600)
                 plt.close()
     
     # Plot comprehensive comparison plots shap

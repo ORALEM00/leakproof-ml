@@ -6,7 +6,7 @@ import seaborn as sns
 
 
 
-def residual_errors(y, y_predictions, filename = None):
+def residual_errors(y, y_predictions, filename = None, fontsize=12):
     """
     Generate a scatter plot of residuals against actual values.
 
@@ -19,6 +19,8 @@ def residual_errors(y, y_predictions, filename = None):
     filename : str, optional
         The system path and name to save the plot (e.g., 'results/residuals.png').
         If None, the plot is displayed interactively.
+    fontsize : int, optional
+        Base font size for the plot text elements.
 
     Returns
     -------
@@ -30,9 +32,12 @@ def residual_errors(y, y_predictions, filename = None):
     # Plot residuals
     plt.scatter(y, residuals, alpha=0.5)
     plt.axhline(y=0, color='red', linestyle='--')
-    plt.xlabel("Actual Values")
-    plt.ylabel("Residuals")
-    plt.title("Residual Plot")
+    # Label axes and title
+    plt.xlabel("Actual Values", fontsize=fontsize, fontweight='bold')
+    plt.ylabel("Residuals", fontsize=fontsize, fontweight='bold')
+    plt.yticks(fontsize=fontsize)
+    plt.xticks(fontsize=fontsize)
+    plt.title("Residual Plot", fontsize=fontsize+4, fontweight='bold', pad=15)
     if filename:
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         plt.savefig(filename, dpi=300)
@@ -43,7 +48,7 @@ def residual_errors(y, y_predictions, filename = None):
 
 
 
-def histogram_errors(y, y_predictions, filename = None):
+def histogram_errors(y, y_predictions, filename = None, fontsize=12):
     """
     Generate a histogram of residual errors.
 
@@ -55,7 +60,8 @@ def histogram_errors(y, y_predictions, filename = None):
         The values predicted by the model.
     filename : str, optional
         Path to save the resulting plot image.
-
+    fontsize : int, optional
+        Base font size for the plot text elements.
     Returns
     -------
     None
@@ -65,9 +71,12 @@ def histogram_errors(y, y_predictions, filename = None):
     # Plot histogram of residuals
     plt.hist(residuals, bins=30, color='blue', edgecolor='black', alpha=0.7)
     plt.axvline(x=0, color='red', linestyle='--')
-    plt.xlabel("Residuals")
-    plt.ylabel("Frequency")
-    plt.title("Histogram of Residual Errors")
+    # Label axes and title
+    plt.xlabel("Residuals", fontsize=fontsize, fontweight='bold')
+    plt.ylabel("Frequency", fontsize=fontsize, fontweight='bold')
+    plt.yticks(fontsize=fontsize)
+    plt.xticks(fontsize=fontsize)
+    plt.title("Histogram of Residual Errors", fontsize=fontsize+4, fontweight='bold', pad=15)
     if filename:
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         plt.savefig(filename, dpi=300)
@@ -78,7 +87,7 @@ def histogram_errors(y, y_predictions, filename = None):
 
 
 
-def plot_predictions(y, y_predictions, filename = None):
+def plot_predictions(y, y_predictions, filename = None, fontsize=12):
     """
     Create a scatter plot comparing actual values against model predictions.
 
@@ -90,6 +99,8 @@ def plot_predictions(y, y_predictions, filename = None):
         The values predicted by the model.
     filename : str, optional
         Path to save the resulting plot image.
+    fontsize : int, optional
+        Base font size for the plot text elements.
 
     Returns
     -------
@@ -98,9 +109,12 @@ def plot_predictions(y, y_predictions, filename = None):
     # Scatter plot of predicted vs actual values
     plt.scatter(y, y_predictions, edgecolor='k', alpha=0.7)
     plt.plot([min(y), max(y)], [min(y), max(y)], color='red', linestyle='--')
-    plt.xlabel('Actual Values')
-    plt.ylabel('Predicted Values')
-    plt.title('Predicted vs Actual Values')
+    # Label axes and title
+    plt.xlabel('Actual Values', fontsize=fontsize, fontweight='bold')
+    plt.ylabel('Predicted Values', fontsize=fontsize, fontweight='bold')
+    plt.yticks(fontsize=fontsize)
+    plt.xticks(fontsize=fontsize)
+    plt.title('Predicted vs Actual Values', fontsize=fontsize+4, fontweight='bold', pad=15)
     if filename:
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         plt.savefig(filename, dpi=300)
@@ -111,7 +125,7 @@ def plot_predictions(y, y_predictions, filename = None):
 
 
 
-def plot_metric_scores(data, title, filename = None):
+def plot_metric_scores(data, title, filename = None, fontsize=12):
     """
     Compare performance metrics across different methodologies and data states.
 
@@ -135,6 +149,8 @@ def plot_metric_scores(data, title, filename = None):
     filename : str, optional
         The system path and filename to save the resulting image. 
         If None, the plot is displayed but not saved.
+    fontsize : int, optional
+        Base font size for the plot text elements.
 
     Returns
     -------
@@ -162,12 +178,12 @@ def plot_metric_scores(data, title, filename = None):
            label='Without Outliers', color=color1_dark, edgecolor='black')
 
     # Plot details
-    ax.set_title(title, fontsize=16, fontweight='bold', pad=20)
-    ax.set_ylabel(f"Mean {data['metric']} Score", fontsize=12)
+    ax.set_title(title, fontsize=fontsize+4, fontweight='bold', pad=20)
+    ax.set_ylabel(f"Mean {data['metric']} Score", fontsize=fontsize, fontweight='bold')
     #plt.yticks(np.arange(0, 1, 0.1)) 
     ax.set_xticks(x)
-    ax.set_xticklabels(data['labels'], rotation=45, ha='right', fontsize=12)
-    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=10)
+    ax.set_xticklabels(data['labels'], rotation=45, ha='right', fontsize=fontsize)
+    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=fontsize-2)
     #ax.set_ylim(0) # R-squared typically ranges from 0 to 1
 
 
@@ -188,7 +204,7 @@ def plot_metric_scores(data, title, filename = None):
         y_pos_without = data['without_outliers_means'][i] + data['without_outliers_stds'][i] + 0.01
         ax.text(x[i] + bar_width*0.65, y_pos_without,
                 f"{data['without_outliers_means'][i]:.2f}",
-                ha='center', va='bottom', fontsize=10, fontweight='bold')
+                ha='center', va='bottom', fontsize=fontsize-2, fontweight='bold')
     
     # Ensure a tight layout and save the figure
     plt.tight_layout()
@@ -202,11 +218,7 @@ def plot_metric_scores(data, title, filename = None):
 
 
 # Feature frequency plot
-def feature_frequency(
-        X, y, 
-        features, 
-        filename = None
-        ): 
+def feature_frequency(X, y, features, filename = None, fontsize=12): 
     """
     Analyze and visualize the selection frequency of features across CV folds.
 
@@ -226,6 +238,8 @@ def feature_frequency(
         (e.g., [[feat1, feat2], [feat1, feat3], ...]).
     filename : str, optional
         Path to save the generated bar plot.
+    fontsize : int, optional
+        Base font size for the plot text elements.
 
     Returns
     -------
@@ -256,17 +270,17 @@ def feature_frequency(
     sns.barplot(x=counts, y=unique, hue=unique, palette='viridis', 
                 legend=False)
     # Label axis
-    plt.xlabel("Frequency", fontsize=14)
-    plt.ylabel("Features", fontsize=14)
-    # plt.title("Feature Selection Frequency", fontsize=16, weight="bold", pad=15)
+    plt.xlabel("Frequency", fontsize=fontsize+3, fontweight='bold')
+    plt.ylabel("Features", fontsize=fontsize+3, fontweight='bold')
+    # plt.title("Feature Selection Frequency", fontsize=fontsize+4, weight="bold", pad=15)
     plt.grid(axis="x", linestyle="--", alpha=0.7)
 
     # Add explicit count labels to the end of each bar for clarity
-    for i, v in enumerate(counts):
-        plt.text(v + 0.1, i, str(v), va='center', fontsize=10)
+    # for i, v in enumerate(counts):
+    #     plt.text(v + 0.1, i, str(v), va='center', fontsize=fontsize-2)
 
-    plt.xticks(fontsize=12)
-    plt.yticks(fontsize=12)
+    plt.xticks(fontsize=fontsize)
+    plt.yticks(fontsize=fontsize)
     plt.tight_layout()
     if filename:
         os.makedirs(os.path.dirname(filename), exist_ok=True)

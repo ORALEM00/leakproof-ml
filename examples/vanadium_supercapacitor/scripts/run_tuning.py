@@ -10,7 +10,7 @@ from xgboost import XGBRegressor #Extreme Gradient Boosting
 from catboost import CatBoostRegressor
 from sklearn.neural_network import MLPRegressor
 
-from leakproof_ml.tuning import train_test_tunning, nested_cv_tunning
+from leakproof_ml.tuning import train_test_tuning, nested_cv_tuning
 from leakproof_ml.preprocessing import drop_outliers
 from leakproof_ml.validation import ShuffledGroupKFold
 
@@ -30,7 +30,7 @@ warnings.filterwarnings(
 
 
 """
-Baseline results of the implemented models (without hypertunning of parameters)
+Tuning of the implemented models 
 """
 
 # Environment variables
@@ -48,7 +48,7 @@ os.chdir(base_dir)
 input_path = "data/processed.csv"
 index_cols = "Num_Data" 
 # Output path
-output_path = "raw_results3"
+output_path = "raw_results"
 summary_filename = "summary_tuned.csv"
 
 
@@ -67,8 +67,7 @@ y_removed = df_removed['C_s']
 groups_removed = df_removed['Group_ID']
 
 # Model's classes to be implemented (not the model itself)
-# model_class = [Ridge, RandomForestRegressor, XGBRegressor, CatBoostRegressor, MLPRegressor]
-model_class = [XGBRegressor]
+model_class = [Ridge, RandomForestRegressor, XGBRegressor, CatBoostRegressor, MLPRegressor]
 
 # Create CV splitters
 outer_random_cv_splitter = KFold(n_splits = outer_n_splits, random_state = RANDOM_SEED, shuffle = True)
@@ -96,19 +95,19 @@ for model in model_class:
 
     # Run tunning of each methodology
     # Simple split
-    trainTest = train_test_tunning(X, y, model, outer_random_cv_splitter, inner_random_cv_splitter, 
+    trainTest = train_test_tuning(X, y, model, outer_random_cv_splitter, inner_random_cv_splitter, 
                                    model_search_function, feature_selection = True)
-    trainTest_removed = train_test_tunning(X_removed, y_removed, model, outer_random_cv_splitter, inner_random_cv_splitter, 
+    trainTest_removed = train_test_tuning(X_removed, y_removed, model, outer_random_cv_splitter, inner_random_cv_splitter, 
                                            model_search_function, feature_selection = True)
     # Random CV
-    randomCV = nested_cv_tunning(X, y, model, outer_random_cv_splitter, inner_random_cv_splitter, 
+    randomCV = nested_cv_tuning(X, y, model, outer_random_cv_splitter, inner_random_cv_splitter, 
                                     model_search_function, feature_selection = True) # With Outliers
-    randomCV_removed = nested_cv_tunning(X_removed, y_removed, model, outer_random_cv_splitter, inner_random_cv_splitter, 
+    randomCV_removed = nested_cv_tuning(X_removed, y_removed, model, outer_random_cv_splitter, inner_random_cv_splitter, 
                                     model_search_function, feature_selection = True) # Without Outliers
     # Grouped CV
-    groupedCV = nested_cv_tunning(X, y, model, outer_grouped_cv_splitter, inner_grouped_cv_splitter, 
+    groupedCV = nested_cv_tuning(X, y, model, outer_grouped_cv_splitter, inner_grouped_cv_splitter, 
                                   model_search_function, groups=groups, feature_selection = True) # With Outliers
-    groupedCV_removed = nested_cv_tunning(X_removed, y_removed, model, outer_grouped_cv_splitter, inner_grouped_cv_splitter, 
+    groupedCV_removed = nested_cv_tuning(X_removed, y_removed, model, outer_grouped_cv_splitter, inner_grouped_cv_splitter, 
                                           model_search_function, groups=groups_removed, feature_selection = True) # Without Outliers
 
     # List format to easy store

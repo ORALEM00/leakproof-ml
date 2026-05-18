@@ -14,7 +14,7 @@ from ..preprocessing._pipeline_utils import  _validate_pipeline, _get_pre_model_
 
 
 
-def train_test_tunning(
+def train_test_tuning(
         X, y, model_class, 
         outer_splitter, inner_splitter, 
         space_search, 
@@ -108,19 +108,6 @@ def train_test_tunning(
         - ``'y_true'``: Actual target values for the test set.
         - ``'features'``: List of features used (if ``return_features`` is True).
         - ``'params'``: The best hyperparameters found during the optimization phase.
-
-    Examples
-    --------
-        from sklearn.ensemble import RandomForestRegressor
-        def rf_search_space(trial):
-            return {
-                    "n_estimators": trial.suggest_int("n_estimators", 100, 1000),
-                    "max_depth": trial.suggest_int("max_depth", 2, 20),
-                    "min_samples_split": trial.suggest_int("min_samples_split", 2, 10),
-                }
-        return rf_search_space
-        results = train_test_tunning(X, y, RandomForestRegressor, space_search=rf_search_space, n_trials=100) 
-        print(results['metrics']['r2'])
     """
     # Validate correct input format
     _validate_tuning_inputs(X, y, model_class, ensemble_params, n_folds=None)
@@ -185,7 +172,7 @@ def train_test_tunning(
 
 
 
-def nested_cv_tunning(
+def nested_cv_tuning(
         X, y, model_class, 
         outer_splitter, inner_splitter, 
         space_search, 
@@ -261,9 +248,13 @@ def nested_cv_tunning(
 
     Returns
     -------
-    results : dict
-        Standardized results containing metrics per fold, out-of-fold 
-        predictions, tracked features, and the best params found per fold.
+     results : dict
+        Consolidated results containing:
+        - ``'metrics'``: Performance scores on the held-out test set.
+        - ``'y_predict'``: Predictions made on the test set.
+        - ``'y_true'``: Actual target values for the test set.
+        - ``'features'``: List of features used (if ``return_features`` is True).
+        - ``'params'``: The best hyperparameters found during the optimization phase.
     """
     # Validate correct input format
     _validate_tuning_inputs(X, y, model_class, ensemble_params, n_folds=outer_splitter.get_n_splits())

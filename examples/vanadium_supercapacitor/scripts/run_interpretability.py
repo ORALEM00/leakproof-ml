@@ -18,6 +18,10 @@ from leakproof_ml.validation import ShuffledGroupKFold
 
 from leakproof_ml.utils import save_results_as_json, load_results_from_json
 
+"""
+Interpretability analysis of the implemented models (SHAP values and Permutation Importance)
+"""
+
 
 # Environment variables
 RANDOM_SEED = 42 # For reproducibility
@@ -34,8 +38,8 @@ data_path = "data/processed.csv"
 index_cols = "Num_Data" 
 
 # Input and output path for interpretability results
-input_path = "raw_results2"
-output_path = "raw_interpretability_results2"
+input_path = "raw_results"
+output_path = "raw_interpretability_results"
 
 # Load dataset
 df = pd.read_csv(data_path, index_col = index_cols) # Complete dataset
@@ -53,8 +57,6 @@ groups_removed = df_removed['Group_ID']
 
 # Model's classes to be implemented (not the model itself)
 model_class = [Ridge,  XGBRegressor, CatBoostRegressor, [CatBoostRegressor, Ridge, XGBRegressor], [RandomForestRegressor, CatBoostRegressor, XGBRegressor]] 
-
-# model_class = [Ridge]  
 
 # Create CV splitters
 random_cv_splitter = KFold(n_splits = n_splits, random_state = RANDOM_SEED, shuffle = True)

@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import os
 from sklearn.model_selection import KFold 
-from sklearn.linear_model import Ridge
+from xgboost import XGBRegressor 
 
 from leakproof_ml import cv_analysis
 from leakproof_ml.preprocessing import drop_outliers
@@ -12,7 +12,7 @@ from leakproof_ml.plots import feature_frequency
 
 """
 Feature stability analysis. 
-This section is model agnostic, so any model can be used. For this we implement Ridge. 
+This section is model agnostic, so any model can be used. For this we implement XGBRegressor. 
 The stability is calculated for each protocol implemented and for both datasets (with and without outliers)s
 """
 
@@ -30,30 +30,31 @@ os.chdir(base_dir)
 input_path = "data/processed.csv"
 index_cols = "Num_Data" 
 # Output path
-output_path = "resulting_plots2/features"
+output_path = "resulting_plots/features"
 
 # Load dataset
 df = pd.read_csv(input_path, index_col = index_cols) 
 
-""" df.rename(columns={
-    "M_Density": "Material Density", 
-    "E_Ionic_Conductivity": "Ionic Conductivity",
-    "E_Bare_Cation_Radius": "Bare Cation Radius",
-    "E_Bare_Anion_Radius": "Bare Anion Radius",
-    "E_Cation_Radius": "Hydrated Cation Radius",
-    "E_Anion_Radius": "Hydrated Anion Radius",
-    "Is_Binder": "Binder Presence",
-    "Binder_Type": "Binder Type",
-    "Morphology_Encoded": "Morphology",
-    "E_pH" : "pH",
-    "Current_Collector": "Current Collector",
-    "CC_Electrical_Conductivity": "CC Electrical Conductivity",
-    "CC_Thermal_Conductivity": "CC Thermal Conductivity",
-    "CC_Work_Function": "CC Work Function",
-    "Potential_Window": "Potential Window",
-    "Synthesis_Method": "Synthesis Method",
-    "Current_Density": "Current Density",
-    }, inplace = True) """
+df.rename(columns={
+    "Mat": "Material", 
+    "sigma_ion": "Ionic Conductivity",
+    "r0_cat": "Bare Cation Radius",
+    "r0_an": "Bare Anion Radius",
+    "r_cat": "Hydrated Cation Radius",
+    "r_an": "Hydrated Anion Radius",
+    "B_flag": "Binder Presence",
+    "B_type": "Binder Type",
+    "Morph": "Morphology",
+    "rho_m": "Material Density",
+    "pH" : "pH",
+    "CC": "Current Collector (CC)",
+    "sigma_cc": "CC Electrical Conductivity",
+    "kappa_cc": "CC Thermal Conductivity",
+    "phi_cc": "CC Work Function",
+    "Delta_V": "Potential Window",
+    "Synth": "Synthesis Method",
+    "j": "Current Density",
+    }, inplace = True)
 
 df_removed = drop_outliers(df, target_column = "C_s", group_id_colum = "Group_ID") # Datset without outliers
 
@@ -67,7 +68,7 @@ X_removed = df_removed.drop(columns = ['C_s', 'Group_ID'])
 y_removed = df_removed['C_s']
 groups_removed = df_removed['Group_ID']
 
-model = Ridge
+model = XGBRegressor
 
 # Create CV splitters
 random_cv_splitter = KFold(n_splits = n_splits, random_state = RANDOM_SEED, shuffle = True)
@@ -83,8 +84,8 @@ groupedCV_removed = cv_analysis(X_removed, y_removed, model, grouped_cv_splitter
 
 # Create feature frequency plots
 # Random CV
-feature_frequency(X, y, randomCV['features'], filename = os.path.join(output_path, "randomCV_with_outliers.png"))
-feature_frequency(X_removed, y_removed, randomCV_removed['features'], filename = os.path.join(output_path, "randomCV_without_outliers.png"))
+feature_frequency(X, y, randomCV['features'], filename = os.path.join(output_path, "randomCV_with_outliers.png"), fontsize=14)
+feature_frequency(X_removed, y_removed, randomCV_removed['features'], filename = os.path.join(output_path, "randomCV_without_outliers.png"), fontsize=14)
 # Grouped CV
-feature_frequency(X, y, groupedCV['features'], filename = os.path.join(output_path, "groupedCV_with_outliers.png"))  
-feature_frequency(X_removed, y_removed, groupedCV_removed['features'], filename = os.path.join(output_path, "groupedCV_without_outliers.png"))
+feature_frequency(X, y, groupedCV['features'], filename = os.path.join(output_path, "groupedCV_with_outliers.png"), fontsize=14)  
+feature_frequency(X_removed, y_removed, groupedCV_removed['features'], filename = os.path.join(output_path, "groupedCV_without_outliers.png"), fontsize=14)

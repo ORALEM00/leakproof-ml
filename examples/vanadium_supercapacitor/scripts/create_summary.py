@@ -4,6 +4,10 @@ import pandas as pd
 
 from leakproof_ml.utils import load_results_from_json
 
+"""
+Script to create a summary table with all the results of the different models and methodologies implemented in the project.
+"""
+
 # Script absolute path
 script_dir = os.path.dirname(os.path.abspath(__file__))
 base_dir = os.path.dirname(script_dir)
@@ -11,16 +15,16 @@ base_dir = os.path.dirname(script_dir)
 os.chdir(base_dir) 
 
 # Input path
-input_path = "raw_results2"
+input_path = "raw_results"
 # Output path
-output_path = "raw_results2"
-model_type = "tuned" # "baseline" or "tuned"
-summary_filename = "summary_tuned.csv"
+output_path = "raw_results"
+model_type = "baseline" # "baseline" or "tuned"
+summary_filename = "summary_baseline.csv"
 
 
 # Create summary table with all the results of the different models and methodologies
-models_name = ['Ridge', 'RandomForestRegressor', 'XGBRegressor', 
-               'CatBoostRegressor', 'MLPRegressor']
+models_name = ['DummyRegressor','LinearRegression','Ridge', 'RandomForestRegressor', 'XGBRegressor', 
+               'CatBoostRegressor', 'MLPRegressor', 'VotingRegressor_0']
 
 methods = ["trainTest","trainTest_removed","randomCV","randomCV_removed","groupedCV", 
            "groupedCV_removed"]
