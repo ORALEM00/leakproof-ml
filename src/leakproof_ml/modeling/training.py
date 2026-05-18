@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split
 
 from ._model_utils import _REGRESSION_METRICS, _validate_inputs, _get_cv_params
 from ._model_utils import _get_model_instance, _get_voting_regressor_instance

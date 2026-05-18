@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold
 
 from ._tuning_utils import _validate_tuning_inputs, run_study

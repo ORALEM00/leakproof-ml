@@ -8,14 +8,8 @@
 ---
 
 [![PyPI](https://img.shields.io/pypi/v/leakproof-ml
-)](https://pypi.org/project/leakproof-ml/)
-
-[![License](https://img.shields.io/pypi/l/leakproof-ml
-)](./LICENSE.txt)
-
-[![Python package](https://github.com/ORALEM00/leakproof-ml/actions/workflows/ci.yml/badge.svg)](https://github.com/ORALEM00/leakproof-ml/actions/workflows/ci.yml)
-
-![Python](https://img.shields.io/pypi/pyversions/leakproof-ml)
+)](https://pypi.org/project/leakproof-ml/)  [![License](https://img.shields.io/pypi/l/leakproof-ml
+)](./LICENSE.txt) [![Python package](https://github.com/ORALEM00/leakproof-ml/actions/workflows/ci.yml/badge.svg)](https://github.com/ORALEM00/leakproof-ml/actions/workflows/ci.yml) ![Python](https://img.shields.io/pypi/pyversions/leakproof-ml)
 
 
 **Leakproof ML** is an open-source Python package that enforces leakage-aware machine learning workflows focused on the most common sources of data leakage arising from improper validation strategies and inadequate isolation between training and test data. Designed to systematically prevent data leakage across the complete modelling process, including:

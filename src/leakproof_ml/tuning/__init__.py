@@ -1,1 +1,1 @@
-from .tuner import train_test_tunning, nested_cv_tunning
+from .tuner import train_test_tuning, nested_cv_tuning

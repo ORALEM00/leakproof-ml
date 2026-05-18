@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split
 from sklearn.inspection import permutation_importance
 
 from ._explainer_utils import _shap_analysis
@@ -11,7 +10,6 @@ from ..modeling._model_utils import _calculate_metrics, _create_cv_results_dict
 
 from ..preprocessing.pipeline import model_pipeline
 from ..preprocessing._pipeline_utils import  _validate_pipeline, _get_pre_model_pipe
-
 
 
 
