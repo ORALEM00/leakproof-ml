@@ -32,7 +32,7 @@ Leakproof ML prevents data leakage by implementing two structural constrains:
 
 ## Install
 
-Leakproof ML can be installed from [PyPI](https://pypi.org/project/leakproof-ml/): 
+Leakproof ML can be installed from Pypi: 
 
 <pre>
 pip install leakproof-ml
