@@ -166,8 +166,8 @@ If used in a research project, please cite paper Leakproof ML in your publicatio
 <summary>BibTeX</summary>
 
 ```bibtex
-@article{Ortiz2025Leakproof,
-  title={Leakproof ML: Data Leakage Prevention with a Robust, Interpretable, and Reproducible Machine Learning Framework},
+@article{,
+  title={A Leakage-Aware Machine Learning Workflow for Reliable Modeling of Experimental Scientific Data: A Case Study on Energy Storage Datasets},
   author={},
   booktitle={},
   pages={},

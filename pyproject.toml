@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "leakproof-ml"
 version = "0.0.2"
 authors = [
-  { name="Alexei Ortiz", email="alex.lztb@gmail.com" },
+  { name="ORALEM00"},
 ]
 description = "ML framework to avoid most common sources of data leakage"
 readme = "README.md"
